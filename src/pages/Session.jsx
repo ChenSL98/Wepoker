@@ -38,6 +38,7 @@ export default function Session() {
       const found = allSessions.find(s => s.code === code?.toUpperCase())
       if (found) {
         setSession(found)
+        setNotFound(false)
         if (firstLoad) {
           const inputs = {}
           found.players.forEach(p => { inputs[p.name] = p.remaining || '' })

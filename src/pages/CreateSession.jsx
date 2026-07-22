@@ -51,8 +51,12 @@ export default function CreateSession() {
       })),
       createdAt: new Date().toISOString()
     }
-    await saveSession(session)
-    navigate(`/session/${code}`)
+    try {
+      await saveSession(session)
+      navigate(`/session/${code}`)
+    } catch (err) {
+      alert('创建牌局失败：' + (err?.message || '未知错误'))
+    }
   }
 
   return (

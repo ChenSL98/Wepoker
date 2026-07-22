@@ -69,7 +69,7 @@ export async function savePlayer(player) {
   const row = playerToRow(player)
   if (supabase) {
     const { error } = await supabase.from('players').upsert(row, { onConflict: 'id' })
-    if (error) console.error(error)
+    if (error) throw error
     return
   }
   const list = readJSON(LS_PLAYERS, [])
@@ -82,7 +82,7 @@ export async function savePlayer(player) {
 export async function removePlayer(id) {
   if (supabase) {
     const { error } = await supabase.from('players').delete().eq('id', id)
-    if (error) console.error(error)
+    if (error) throw error
     return
   }
   writeJSON(LS_PLAYERS, readJSON(LS_PLAYERS, []).filter(p => p.id !== id))
@@ -102,7 +102,7 @@ export async function saveSession(session) {
   const row = sessionToRow(session)
   if (supabase) {
     const { error } = await supabase.from('sessions').upsert(row, { onConflict: 'id' })
-    if (error) console.error(error)
+    if (error) throw error
     return
   }
   const list = readJSON(LS_SESSIONS, [])
