@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fetchSessions, subscribeToSessions } from '../lib/supabase'
 
 export default function Home() {
   const navigate = useNavigate()
   const [sessions, setSessions] = useState([])
+  const clickTimer = useRef(null)
+  const clickCount = useRef(0)
 
   useEffect(() => {
     let alive = true
@@ -17,11 +19,25 @@ export default function Home() {
     return () => { alive = false; unsub() }
   }, [])
 
+  const handleTitleClick = () => {
+    clickCount.current++
+    if (clickCount.current === 1) {
+      clickTimer.current = setTimeout(() => { clickCount.current = 0 }, 600)
+    } else if (clickCount.current === 3) {
+      clearTimeout(clickTimer.current)
+      clickCount.current = 0
+      navigate('/leaderboard')
+    }
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
       <div className="bg-purple-600 text-white px-5 py-8 rounded-b-3xl">
-        <h1 className="text-2xl font-bold tracking-wide">欢乐豆计分器</h1>
+        <h1
+          className="text-2xl font-bold tracking-wide select-none cursor-default"
+          onClick={handleTitleClick}
+        >欢乐豆计分器</h1>
         <p className="text-purple-200 text-sm mt-1">游戏积分，禁止赌博</p>
       </div>
 
@@ -39,19 +55,6 @@ export default function Home() {
             </div>
             <div className="text-sm font-semibold text-gray-800">创建牌局</div>
             <div className="text-xs text-gray-400 mt-0.5">发起新一局</div>
-          </button>
-
-          <button
-            onClick={() => navigate('/leaderboard')}
-            className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 active:scale-95 transition-transform"
-          >
-            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-2">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#BA7517" strokeWidth="2" strokeLinecap="round">
-                <polyline points="6,9 12,5 18,9"/><polyline points="6,17 6,13 18,13 18,17"/><line x1="4" y1="21" x2="20" y2="21"/>
-              </svg>
-            </div>
-            <div className="text-sm font-semibold text-gray-800">排行榜</div>
-            <div className="text-xs text-gray-400 mt-0.5">周月季年排行</div>
           </button>
 
           <button
@@ -128,7 +131,6 @@ export default function Home() {
         {[
           { label: '首页', path: '/', active: true },
           { label: '玩家', path: '/players' },
-          { label: '排行', path: '/leaderboard' },
         ].map(item => (
           <button
             key={item.label}

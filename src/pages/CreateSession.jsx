@@ -17,6 +17,9 @@ export default function CreateSession() {
   const [pointsPerHand, setPointsPerHand] = useState(500)
   const [selected, setSelected] = useState([])
   const [sessionName, setSessionName] = useState('')
+  const [authorized, setAuthorized] = useState(false)
+  const [pwd, setPwd] = useState('')
+  const [pwdError, setPwdError] = useState(false)
 
   useEffect(() => {
     fetchPlayers().then(setPlayers)
@@ -59,9 +62,57 @@ export default function CreateSession() {
     }
   }
 
+  const checkPwd = () => {
+    if (pwd === '12580') {
+      setAuthorized(true)
+      setPwdError(false)
+    } else {
+      setPwdError(true)
+    }
+  }
+
+  if (!authorized) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <div className="bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3">
+          <button onClick={() => navigate('/')} className="text-gray-400 p-1">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <polyline points="15,18 9,12 15,6"/>
+            </svg>
+          </button>
+          <h1 className="text-lg font-bold text-gray-800">创建牌局</h1>
+        </div>
+        <div className="flex-1 flex flex-col items-center justify-center px-5 -mt-10">
+          <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mb-4">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="2" strokeLinecap="round">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+          </div>
+          <h2 className="text-base font-semibold text-gray-700 mb-6">请输入密码</h2>
+          <input
+            type="password"
+            value={pwd}
+            onChange={e => { setPwd(e.target.value); setPwdError(false) }}
+            onKeyDown={e => e.key === 'Enter' && checkPwd()}
+            placeholder="输入密码"
+            autoFocus
+            className={`w-full max-w-xs px-4 py-3 text-center text-lg border rounded-xl focus:outline-none ${
+              pwdError ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-purple-400'
+            }`}
+          />
+          {pwdError && <p className="text-red-500 text-sm mt-2">密码错误，请重试</p>}
+          <button
+            onClick={checkPwd}
+            className="mt-5 px-10 py-3 bg-purple-600 text-white rounded-xl text-sm font-bold active:bg-purple-700"
+          >
+            确认
+          </button>
+        </div>
+      </div>
+    )
+  }
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Header */}
       <div className="bg-white border-b border-gray-100 px-5 py-4 flex items-center gap-3">
         <button onClick={() => navigate('/')} className="text-gray-400 p-1">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
