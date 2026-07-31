@@ -5,6 +5,9 @@ import { fetchSessions, subscribeToSessions } from '../lib/supabase'
 export default function Home() {
   const navigate = useNavigate()
   const [sessions, setSessions] = useState([])
+  const [sessionAuth, setSessionAuth] = useState(false)
+  const [sessionPwd, setSessionPwd] = useState('')
+  const [sessionPwdError, setSessionPwdError] = useState(false)
   const clickTimer = useRef(null)
   const clickCount = useRef(0)
 
@@ -27,6 +30,15 @@ export default function Home() {
       clearTimeout(clickTimer.current)
       clickCount.current = 0
       navigate('/leaderboard')
+    }
+  }
+
+  const checkSessionPwd = () => {
+    if (sessionPwd.toLowerCase() === 'winner') {
+      setSessionAuth(true)
+      setSessionPwdError(false)
+    } else {
+      setSessionPwdError(true)
     }
   }
 
@@ -74,10 +86,38 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Recent sessions */}
+      {/* Recent sessions - password gated */}
       <div className="px-5 mt-6 flex-1">
         <h2 className="text-sm font-semibold text-gray-500 mb-3">最近牌局</h2>
-        {sessions.length === 0 ? (
+        {!sessionAuth ? (
+          <div className="bg-white rounded-xl border border-gray-100 p-6 text-center">
+            <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+              </svg>
+            </div>
+            <p className="text-xs text-gray-400 mb-3">查看记录需要密码</p>
+            <div className="flex gap-2 max-w-xs mx-auto">
+              <input
+                type="password"
+                value={sessionPwd}
+                onChange={e => { setSessionPwd(e.target.value); setSessionPwdError(false) }}
+                onKeyDown={e => e.key === 'Enter' && checkSessionPwd()}
+                placeholder="输入密码"
+                className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none ${
+                  sessionPwdError ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-purple-400'
+                }`}
+              />
+              <button
+                onClick={checkSessionPwd}
+                className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg font-medium active:bg-purple-700"
+              >
+                确认
+              </button>
+            </div>
+            {sessionPwdError && <p className="text-red-500 text-xs mt-2">密码错误，请重试</p>}
+          </div>
+        ) : sessions.length === 0 ? (
           <div className="text-center py-10 text-gray-400 text-sm">
             还没有牌局记录，点击「创建牌局」开始吧
           </div>
